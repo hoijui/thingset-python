@@ -10,7 +10,7 @@ class CSVParser(object):
         for line in self.csv:
             content = line.split(';')
 
-            data = bytes.fromhex(''.join([self._makehex(b) for b in content[4:]]))
+            data = bytes.fromhex(''.join([self._make_hex(b) for b in content[4:]]))
             pkt = SingleFrame(data=data)
             identifier = int(content[2], 16) + (0b11 << 24)
             pkt.parseIdentifier(identifier)
@@ -18,25 +18,28 @@ class CSVParser(object):
             yield pkt
 
         self.csv.close()
-    
-    def _makehex(self, string):
+
+    @staticmethod
+    def _make_hex(self, string):
         string = string.rstrip()
         if len(string) == 1:
             return '0' + string
         return string
 
-def playback(tracefile, duration=600):
-    p = CSVParser(tracefile)
+def playback(trace_file, duration=600):
+    p = CSVParser(trace_file)
     message = iter(p)
-    playbackStart = time()
-    while (time() - playbackStart) < duration:
+    playback_start = time()
+    while (time() - playback_start) < duration:
         pkt = next(message)
-        timediff = time() - playbackStart
-        if pkt.timestamp*0.001 <= timediff:
-            printNice(pkt)
+        time_diff = time() - playback_start
+        if pkt.timestamp * 0.001 <= time_diff:
+            print_nice(pkt)
         else:
-            sleep(pkt.timestamp*0.001)
-            printNice(pkt)
+            sleep(pkt.timestamp * 0.001)
+            print_nice(pkt)
 
-def printNice(msg):
-    print("[{}] Prio {} from Source {}: DataObjectID: {} -> {:.3f}".format(msg.timestamp, msg.priority, msg.source, msg.dataobjectID,msg.cbor))
+
+def print_nice(msg):
+    print("[{}] Prio {} from Source {}: DataObjectID: {} -> {:.3f}".format(msg.timestamp, msg.priority, msg.source,
+                                                                           msg.dataobjectID, msg.cbor))
