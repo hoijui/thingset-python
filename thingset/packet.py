@@ -1,5 +1,5 @@
-from socket import CAN_EFF_FLAG
 from cbor2 import loads
+
 
 class TSPacket(object):
     TS_FRAME_FLAG = (1 << 24)
